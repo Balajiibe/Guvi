@@ -1,71 +1,98 @@
-import re
-import pandas as pd
+import re as re
+class ProjectLogin:
 
- 
-def Register():
+    def Purpose(self):
+        self.Flow=input('Please Select Register / Login: ')
+        if self.Flow.title()=='Register':
+            self.Register()
+        elif self.Flow.title()=='Login':
+            self.Login()
+        else :
+            print('Please select Valid input')
+    def Register(self):
+        self.GetUserId()
+    def GetUserId(self):
+        self.UserId=input('Enter UserId: ')
+        self.UserId=self.UserId.lower()
+        ValidUserName = re.match('^[a-zA-Z]+[a-zA_Z0-9_\-\.]*@[a-zA-Z]{4,9}.[a-zA-Z]', self.UserId)
+        if ValidUserName and self.Flow.title()=='Register''':
+            print('U Id Valid')
+            self.CheckUserId()
+        elif ValidUserName and self.Flow.title()=='Login':
+            self.CheckUserId()
+        else:
+            print('UserId Not Valid')
+            self.GetUserId()
+    def CheckUserId(self):
+        DataBase = open("DataBase.txt", 'r')
+        # print(DataBase.read())
+        U = []
+        P = []
+        for i in DataBase:
+            a, b = i.split(', ')
+            b = b.strip()
+            U.append(a)
+            P.append(b)
+        self.datas = {'UserId': [], 'Password': []}
+        self.datas.update({'UserId': U, 'Password': P})
+        # print(self.datas['UserId'])
+        if self.UserId in self.datas['UserId'] and self.Flow.title()=='Register' :
+            print('UserId Already Exists Please Login, Try Login')
+            self.Flow='Login'
+            self.Login()
+        elif self.UserId in self.datas['UserId'] and self.Flow.title()=='Login' :
+            print('u id in db')
+            self.GetPassword()
+        elif self.UserId not in self.datas['UserId'] and self.Flow.title()=='Login' :
+            print('u id not in db, Try Register')
+            self.Flow='Register'
+            self.Register()
+        elif self.UserId not in self.datas['UserId'] and self.Flow.title() == 'Register':
+            self.GetPassword()
 
-  db=open("database.csv",'a')
-  UserName = input('Create User: ')
-  Password = input('Create Password: ')
-  ValidUserName=re.match('^[a-zA-Z]+[a-zA_Z0-9_\-\.]*@[a-zA-Z]{4,9}.[a-zA-Z]',UserName)
-  ValidPassword="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@!#$%&*?])[A-Za-z\d@$!#%*?&]{5,16}$"
-  Pw=re.compile(ValidPassword)
-  MatchPass = re.match(Pw,Password)
-  db.close()
-  Users=[]   
-  try:
-    db=pd.read_csv("/content/database.csv")
-    df=pd.DataFrame(db)
-  # print(df['UserName'])
+    def GetPassword(self):
+        self.Password = input('Enter Password: ')
+        ValidPassword = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@!#$%&*?])[A-Za-z\d@$!#%*?&]{5,16}$"
+        Pw = re.compile(ValidPassword)
+        self.MatchPass = re.match(Pw, self.Password)
+        if self.Flow.title() == 'Register' and self.MatchPass:
+            self.InsertNewId()
+        elif self.Flow.title() == 'Register':
+            print('Enter Strong Password')
+            self.GetPassword()
+        elif self.Flow.title()=='Login':
+            self.IdIndex = self.datas['UserId'].index(self.UserId)
+            if self.UserId == self.datas['UserId'][self.IdIndex]:
+                if self.Password == self.datas['Password'][self.IdIndex]:
+                    print('Hi ' + self.UserId + ' Welcome back')
+                else:
+                    i = 1
+                    while i <= 3:
+                        print('Wrong Password Try Again ' + 'no of attempts ' + str(i))
+                        i = i + 1
+                        if self.Password == self.datas['Password'][self.IdIndex]:
+                            print('Hi ' + self.UserId + ' Welcome back')
+                            break
+                        elif i>3:
+                            print('Entered wrong password many times')
+                            print('Please update new Password')
+                            self.Login()
+                            # self.ForgetPassword()
+                            break
+                        else:
+                            self.Password=input('Re-Enter Password: ')
 
-    for i in df['UserName']:
-      Users.append(i.lower())
-  # print(Users)
-  except:
-    pass  
-  if UserName in Users:
-    print('User Already Exists, Try Log in')
-    Login()
 
-  else :
-    if ValidUserName:
-      
-      if MatchPass:
-        # db.close()
-        db=open('database.csv','a')
-        db.write(UserName+ ', '+ Password +'\n')
+
+    def InsertNewId(self):
+        db = open("DataBase.txt", 'a')
+        db.write(self.UserId.lower() + ', ' + self.Password + '\n')
         db.close()
-        print('User created Successfully')
-      else :
-        print('Weak Password, Please Try again' )
-        Register()
-    else :
-      print('User Id not valid, Please try again')
-      Register()
+        print('User Created Successfully')
 
-
-def Login():
-  Users=[]
-  try:
-    db=open("database.csv",'a')
-    db.close()
-    db=pd.read_csv("/content/database.csv")
-    df=pd.DataFrame(db)
-    for i in df['UserName']:
-      Users.append(i.lower())
-    if UserName in Users:
-      pass
-
-  except :
-    print('User not Exists')
-  
-
-# Register()  
-# Login()
-ip=input('Please choose Register/ Login or forget Password:')
-if ip.title()=='Register':
-  Register()
-elif ip.title()=='Login':
-  Login()
-elif ip.lower()=='forget password':
-  pass 
+    def Login(self):
+        self.GetUserId()
+ 
+ 
+a=ProjectLogin()
+a.Purpose()
